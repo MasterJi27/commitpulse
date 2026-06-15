@@ -1,5 +1,11 @@
 // lib/calculate.ts
-import type { ContributionCalendar, ContributionDay, StreakStats, MonthlyStats } from '../types';
+import type {
+  ContributionCalendar,
+  ContributionDay,
+  ContributionWeek,
+  StreakStats,
+  MonthlyStats,
+} from '../types';
 
 /* ==========================================================================
  * STREAK & CALENDAR CALCULATIONS
