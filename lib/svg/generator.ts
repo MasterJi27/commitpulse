@@ -10,6 +10,7 @@ import type {
 import { getLabels, type BadgeLabels } from '../i18n/badgeLabels';
 import { AUTO_THEME_DARK, AUTO_THEME_LIGHT, themes } from './themes';
 import { getTowerAnimationCSS } from './animations';
+import { DEFAULT_FONTS_BASE64 } from './fonts';
 import { computeTowers, type TowerData } from './layout';
 import { LANGUAGE_COLORS } from './languageColors';
 import {
@@ -376,7 +377,7 @@ function renderStyle(
 
   return `
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   ${getTowerAnimationCSS(entrance, sf)}
   .scan-line {
@@ -572,8 +573,18 @@ function renderTowers(
       top: `M${ax_sf} ${rnd(ay_sf - hOffset)} L${bx_sf} ${rnd(by_sf - hOffset)} L${cx_sf} ${rnd(cy_sf - hOffset)} L${dx_sf} ${rnd(dy_sf - hOffset)} Z`,
     };
 
+    let shadowMarkup = '';
+    if (!isGhost && hOffset > 0) {
+      const vx = rnd(-hOffset * 0.7);
+      const vy = rnd(-hOffset * 0.35);
+      const shadowPath = `M${cx_sf} ${cy_sf} L${bx_sf} ${by_sf} L${rnd(bx_sf + vx)} ${rnd(by_sf + vy)} L${rnd(ax_sf + vx)} ${rnd(ay_sf + vy)} L${rnd(dx_sf + vx)} ${rnd(dy_sf + vy)} L${dx_sf} ${dy_sf} Z`;
+      const shadowColor = isAutoTheme ? 'var(--cp-negative, #000000)' : '#000000';
+      shadowMarkup = `<path d="${shadowPath}" fill="${shadowColor}" fill-opacity="0.15" />`;
+    }
+
     towers += `
         <g transform="translate(${towerX}, ${towerY})"${dimAttr}>
+          ${shadowMarkup}
           <g class="cp-tower interactive-tower" data-date="${escapeXML(t.date)}" data-count="${t.contributionCount}" data-metric="${escapeXML(metric)}" style="animation-delay: ${delay}s;">
             ${animate && t.isToday ? '<animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />' : ''}
             <title>${escapeXML(t.tooltip)}</title>
@@ -916,7 +927,7 @@ function generateCompactSVG(stats: StreakStats, params: BadgeParams): string {
   <title id="cp-title-${safeId}">CommitPulse Compact Streak for ${safeUser}</title>
   <desc id="cp-desc-${safeId}">${safeUser} has a current streak of ${stats.currentStreak} days.</desc>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   .cp-compact-title { font-family: ${selectedFont || '"Syncopate", sans-serif'}; fill: ${text}; font-size: 15px; font-weight: 700; letter-spacing: 1px; opacity: 0.9; }
   .cp-compact-streak { font-family: ${statsFont}; fill: ${accent}; font-size: 20px; font-weight: 600; }
@@ -978,7 +989,7 @@ function generateAutoThemeSVG(
   ${renderHeader(safeUser, stats, sf, params, safeId)}
 
   <style>
-@import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   :root { --cp-bg: #${light.bg}; --cp-text: #${light.text}; --cp-accent: #${light.accent}; --cp-label-fill: ${lightLabelFill}; --cp-label-opacity: ${lightLabelOpacity}; }
   @media (prefers-color-scheme: dark) { :root { --cp-bg: #${dark.bg}; --cp-text: #${dark.text}; --cp-accent: #${dark.accent}; --cp-label-fill: ${darkLabelFill}; --cp-label-opacity: ${darkLabelOpacity}; } }
@@ -1131,7 +1142,7 @@ export function generateMonthlySVG(stats: MonthlyStats, params: BadgeParams): st
   <title id="cp-title-${safeId}">Monthly Stats for ${safeUser}</title>
   <desc id="cp-desc-${safeId}">Monthly stats for ${safeUser}: ${stats.currentMonthTotal} ${commitsLabel} vs previous month delta of ${deltaText}.</desc>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
 
   .title { font-family: ${selectedFont || '"Syncopate", sans-serif'}; fill: ${text}; font-size: 14px; letter-spacing: 2px; font-weight: 400; opacity: 0.8; }
@@ -1320,7 +1331,7 @@ export function generateWrappedSVG(
   </defs>
 
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   ${autoThemeVariables}
 
@@ -1454,7 +1465,7 @@ function generateAutoThemeMonthlySVG(stats: MonthlyStats, params: BadgeParams): 
   <title id="cp-title-${safeId}">Monthly Stats for ${safeUser}</title>
   <desc id="cp-desc-${safeId}">Monthly stats for ${safeUser}: ${stats.currentMonthTotal} ${commitsLabel} vs previous month delta of ${deltaText}.</desc>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   :root { --cp-bg: #${light.bg}; --cp-text: #${light.text}; --cp-accent: #${light.accent}; --cp-negative: #${light.negative || 'cf222e'}; }
   @media (prefers-color-scheme: dark) { :root { --cp-bg: #${dark.bg}; --cp-text: #${dark.text}; --cp-accent: #${dark.accent}; --cp-negative: #${dark.negative || 'f85149'}; } }
@@ -1715,7 +1726,7 @@ export function generateHeatmapSVG(
       : '';
 
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" role="img" aria-labelledby="cp-title-${safeId}" aria-describedby="cp-desc-${safeId}">
   <title>CommitPulse Heatmap for ${safeUser}</title>
   <desc>${safeUser} has ${stats.totalContributions} ${unit} and a longest streak of ${stats.longestStreak} days.</desc>
 
@@ -1724,7 +1735,7 @@ export function generateHeatmapSVG(
   </defs>
 
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
 
   .hm-title { font-family: ${selectedFont || '"Syncopate", sans-serif'}; fill: ${text}; font-size: ${s(14)}px; letter-spacing: ${s(4)}px; font-weight: 400; opacity: 0.8; }
@@ -1842,7 +1853,7 @@ function generateAutoThemeHeatmapSVG(
       : '';
 
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" role="img" aria-labelledby="cp-title-${safeId}" aria-describedby="cp-desc-${safeId}">
   <title>CommitPulse Heatmap for ${safeUser}</title>
   <desc>${safeUser} has ${stats.totalContributions} ${unit} and a longest streak of ${stats.longestStreak} days.</desc>
 
@@ -1851,7 +1862,7 @@ function generateAutoThemeHeatmapSVG(
   </defs>
 
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
 
   :root { --cp-bg: #${light.bg}; --cp-text: #${light.text}; --cp-accent: #${light.accent}; }
@@ -2045,7 +2056,8 @@ export function generateNotFoundSVG(
   </defs>
 
   <style>
-@import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap');    .title  { font-family: "Syncopate", sans-serif; fill: ${text}; font-size: 18px; letter-spacing: 6px; font-weight: 400; opacity: 0.5; }
+${DEFAULT_FONTS_BASE64}
+  .title  { font-family: "Syncopate", sans-serif; fill: ${text}; font-size: 18px; letter-spacing: 6px; font-weight: 400; opacity: 0.5; }
     .label  { font-family: "Roboto", sans-serif; fill: ${accent}; font-size: 11px; letter-spacing: 2px; opacity: 0.4; }
     .stats  { font-family: "Space Grotesk", sans-serif; fill: ${text}; font-size: 42px; font-weight: 500; opacity: 0.2; }
     .ghost-pulse { animation: gp 2.6s ease-in-out infinite; }
@@ -2252,7 +2264,7 @@ function generateAutoThemeVersusSVG(
   ${renderDefs(sf, params)}
 
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   :root { --cp-bg: #${light.bg}; --cp-text: #${light.text}; --cp-accent: #${light.accent}; --cp-label-fill: ${lightLabelFill}; --cp-label-opacity: ${lightLabelOpacity}; }
   @media (prefers-color-scheme: dark) { :root { --cp-bg: #${dark.bg}; --cp-text: #${dark.text}; --cp-accent: #${dark.accent}; --cp-label-fill: ${darkLabelFill}; --cp-label-opacity: ${darkLabelOpacity}; } }
   .cp-bg-fill { fill: var(--cp-bg); } .cp-text-fill { fill: var(--cp-text); color: var(--cp-text); } .cp-accent-fill { fill: var(--cp-accent); color: var(--cp-accent); }
@@ -2414,7 +2426,7 @@ export function generatePulseSVG(
   <title id="cp-title-${safeId}">Heartbeat Sparkline for ${safeUser}</title>
   <desc id="cp-desc-${safeId}">Heartbeat sparkline for ${safeUser} showing commit activity over the last 30 days (total commits: ${pulseTotal}).</desc>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
 
   .title { font-family: ${selectedFont || '"Syncopate", sans-serif'}; fill: ${text}; font-size: 16px; letter-spacing: 2px; font-weight: 700; opacity: 0.9; }
@@ -2599,7 +2611,7 @@ function generateAutoThemePulseSVG(
   <title id="cp-title-${safeId}">Heartbeat Sparkline for ${safeUser}</title>
   <desc id="cp-desc-${safeId}">Heartbeat sparkline for ${safeUser} showing commit activity over the last 30 days (total commits: ${pulseTotal}).</desc>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
 
   :root { --cp-bg: #${light.bg}; --cp-text: #${light.text}; --cp-accent: #${light.accent}; }
@@ -3116,8 +3128,8 @@ export function generateRateLimitSVG(
   </defs>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap');
-    .title  { font-family: "Syncopate", sans-serif; fill: ${text}; font-size: 18px; letter-spacing: 6px; font-weight: 400; opacity: 0.5; }
+    ${DEFAULT_FONTS_BASE64}
+  .title  { font-family: "Syncopate", sans-serif; fill: ${text}; font-size: 18px; letter-spacing: 6px; font-weight: 400; opacity: 0.5; }
     .label  { font-family: "Roboto", sans-serif; fill: ${accent}; font-size: 11px; letter-spacing: 2px; opacity: 0.4; }
     .stats  { font-family: "Space Grotesk", sans-serif; fill: ${text}; font-size: 42px; font-weight: 500; opacity: 0.2; }
     .ghost-pulse { animation: gp 2.6s ease-in-out infinite; }
@@ -3224,7 +3236,7 @@ export function generateLanguagesSVG(
 
   if (total === 0) {
     return `
-<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" role="img" aria-labelledby="cp-title-${safeId}">
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" role="img" aria-labelledby="cp-title-${safeId}" aria-describedby="cp-desc-${safeId}">
   ${renderHeader(safeUser, stats, sf, params, safeId)}
   ${renderStyle(selectedFont, statsFont, googleFontsImport, text, accent, sf, bg, params.entrance || 'rise')}
   <rect width="${W}" height="${H}" rx="${radius}" fill="${params.hideBackground ? 'transparent' : bg}" ${borderAttr} />
@@ -3358,7 +3370,7 @@ export function generateActivityGraphSVG(
   <desc id="cp-desc-${safeId}">Contribution activity graph for ${safeUser} over ${days} days, totalling ${totalCount} ${unit.toLowerCase()}.</desc>
   &lt;!--_renderActivityGraphDefs(accent, bg, params)--&gt;
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   &lt;!--_activityGraphCSS(selectedFont, statsFont, text, accent, false)--&gt;
   </style>
@@ -3428,7 +3440,7 @@ function generateAutoThemeActivityGraphSVG(
     </filter>
   </defs>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap');
+  ${DEFAULT_FONTS_BASE64}
   ${googleFontsImport}
   :root { --cp-bg: #${light.bg}; --cp-text: #${light.text}; --cp-accent: #${light.accent}; }
   @media (prefers-color-scheme: dark) { :root { --cp-bg: #${dark.bg}; --cp-text: #${dark.text}; --cp-accent: #${dark.accent}; } }
